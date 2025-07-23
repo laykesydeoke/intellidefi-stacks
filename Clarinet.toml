@@ -5,6 +5,11 @@ authors = []
 telemetry = true
 cache_dir = './.cache'
 requirements = []
+[contracts.ai-oracle]
+path = 'contracts/ai-oracle.clar'
+clarity_version = 3
+epoch = 3.1
+
 [contracts.protocol-registry]
 path = 'contracts/protocol-registry.clar'
 clarity_version = 3
