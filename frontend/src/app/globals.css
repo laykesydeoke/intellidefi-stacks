@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 6.9%;
+    --card-foreground: 210 40% 98%;
+    --primary: 271.5 81.3% 55.9%;
+    --primary-foreground: 210 40% 98%;
+    --accent-orange: 24.6 95% 53.1%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --border: 217.2 32.6% 17.5%;
+    --ring: 271.5 81.3% 55.9%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .intellidefi-card {
+    @apply relative rounded-xl border border-surface-700/50 bg-surface-900/80 backdrop-blur-sm;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:border-stacks-600/40 hover:shadow-glow-sm;
+  }
+
+  .intellidefi-card-interactive {
+    @apply intellidefi-card cursor-pointer;
+    @apply hover:-translate-y-1 hover:shadow-glow;
+  }
+
+  .intellidefi-button-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold;
+    @apply bg-gradient-to-r from-stacks-600 to-stacks-500 text-white;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:from-stacks-500 hover:to-stacks-400 hover:shadow-glow;
+    @apply active:scale-[0.98];
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
+  }
+
+  .intellidefi-button-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold;
+    @apply border border-surface-600 bg-surface-800/50 text-surface-200;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:border-stacks-600/50 hover:bg-surface-800 hover:text-white;
+    @apply active:scale-[0.98];
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .intellidefi-button-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold;
+    @apply bg-gradient-to-r from-bitcoin-600 to-bitcoin-500 text-white;
+    @apply transition-all duration-200 ease-out;
+    @apply hover:from-bitcoin-500 hover:to-bitcoin-400 hover:shadow-glow-orange;
+    @apply active:scale-[0.98];
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
+  }
+
+  .intellidefi-input {
+    @apply w-full rounded-lg border border-surface-700 bg-surface-900/60 px-4 py-3;
+    @apply text-surface-100 placeholder:text-surface-500;
+    @apply transition-all duration-200;
+    @apply focus:border-stacks-500 focus:outline-none focus:ring-2 focus:ring-stacks-500/20;
+  }
+
+  .intellidefi-label {
+    @apply block text-sm font-medium text-surface-300 mb-2;
+  }
+
+  .intellidefi-badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+    @apply border border-surface-700 bg-surface-800/60 text-surface-300;
+  }
+
+  .intellidefi-badge-success {
+    @apply intellidefi-badge border-emerald-500/30 bg-emerald-500/10 text-emerald-400;
+  }
+
+  .intellidefi-badge-warning {
+    @apply intellidefi-badge border-bitcoin-500/30 bg-bitcoin-500/10 text-bitcoin-400;
+  }
+
+  .intellidefi-badge-danger {
+    @apply intellidefi-badge border-red-500/30 bg-red-500/10 text-red-400;
+  }
+
+  .intellidefi-badge-info {
+    @apply intellidefi-badge border-stacks-500/30 bg-stacks-500/10 text-stacks-400;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-stacks-400 to-bitcoin-400;
+  }
+
+  .gradient-text-bright {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-stacks-300 to-bitcoin-300;
+  }
+
+  .section-divider {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-surface-700 to-transparent;
+  }
+
+  .glass-panel {
+    @apply rounded-2xl border border-surface-700/30 bg-surface-900/40 backdrop-blur-xl;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-in {
+    animation: animateIn 0.5s ease-out forwards;
+  }
+
+  @keyframes animateIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(222.2, 84%, 4.9%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(217.2, 32.6%, 17.5%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(215, 20.2%, 30%);
+}
