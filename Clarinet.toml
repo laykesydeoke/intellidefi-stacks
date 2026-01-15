@@ -8,38 +8,38 @@ requirements = []
 
 [contracts.strategy-engine]
 path = 'contracts/strategy-engine.clar'
-clarity_version = 3
-epoch = 3.1
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.risk-manager]
 path = 'contracts/risk-manager.clar'
-clarity_version = 3
-epoch = 3.1
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.protocol-registry]
 path = 'contracts/protocol-registry.clar'
-clarity_version = 3
-epoch = 3.1
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.ai-oracle]
 path = 'contracts/ai-oracle.clar'
-clarity_version = 3
-epoch = 3.1
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.strategy-optimizer]
 path = 'contracts/strategy-optimizer.clar'
-clarity_version = 3
-epoch = 3.1
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.audit-trail]
 path = 'contracts/audit-trail.clar'
-clarity_version = 3
-epoch = 3.1
+clarity_version = 4
+epoch = 'latest'
 
 [contracts.compliance-monitor]
 path = 'contracts/compliance-monitor.clar'
-clarity_version = 3
-epoch = 3.1
+clarity_version = 4
+epoch = 'latest'
 
 [repl.analysis]
 passes = ['check_checker']
