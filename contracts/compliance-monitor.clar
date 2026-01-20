@@ -167,7 +167,7 @@
     (needs-reset (> (- stacks-block-height (get last-reset-block limits)) (blocks-per-day)))
     (current-daily (if needs-reset u0 (get daily-volume limits)))
   )
-    (asserts! (var-get compliance-enabled) (ok true))
+    (asserts! (var-get compliance-enabled) err-not-authorized)
     (asserts! (is-eq (get status profile) status-approved) err-compliance-violation)
     (asserts! (<= amount (var-get max-transaction-amount)) err-compliance-violation)
     (asserts! (<= (+ current-daily amount) (var-get daily-limit)) err-compliance-violation)
