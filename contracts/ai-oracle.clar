@@ -19,6 +19,8 @@
 
 ;; Data Variables
 (define-data-var oracle-counter uint u0)
+(define-data-var signal-counter uint u0)
+(define-data-var prediction-counter uint u0)
 (define-data-var min-confidence-threshold uint u7000) ;; 70%
 (define-data-var max-data-age uint u144) ;; ~24 hours in blocks
 
@@ -209,13 +211,13 @@
   (duration uint)
 )
   (let (
-    (signal-id (+ (var-get oracle-counter) u1))
+    (signal-id (+ (var-get signal-counter) u1))
   )
     (asserts! (or (is-contract-owner) (is-authorized-updater tx-sender)) err-owner-only)
     (asserts! (validate-confidence confidence) err-invalid-data)
     (asserts! (>= confidence (var-get min-confidence-threshold)) err-insufficient-confidence)
     (asserts! (<= strength u100) err-invalid-data)
-    
+
     (map-set market-signals
       { signal-id: signal-id }
       {
@@ -227,7 +229,8 @@
         expires-at: (+ stacks-block-height duration)
       }
     )
-    
+
+    (var-set signal-counter signal-id)
     (ok signal-id)
   )
 )
@@ -240,13 +243,13 @@
   (confidence uint)
 )
   (let (
-    (prediction-id (+ (var-get oracle-counter) u1))
+    (prediction-id (+ (var-get prediction-counter) u1))
   )
     (asserts! (or (is-contract-owner) (is-authorized-updater tx-sender)) err-owner-only)
     (asserts! (validate-confidence confidence) err-invalid-data)
     (asserts! (>= confidence (var-get min-confidence-threshold)) err-insufficient-confidence)
     (asserts! (and (>= risk-score u1) (<= risk-score u10)) err-invalid-data)
-    
+
     (map-set ai-predictions
       { prediction-id: prediction-id }
       {
@@ -258,7 +261,8 @@
         created-at: stacks-block-height
       }
     )
-    
+
+    (var-set prediction-counter prediction-id)
     (ok prediction-id)
   )
 )
