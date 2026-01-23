@@ -245,7 +245,7 @@
       { rebalance-id: rebalance-id }
       {
         strategy-id: strategy-id,
-        old-allocations: (list), ;; Would store previous allocations
+        old-allocations: new-allocations, ;; Store current as reference
         new-allocations: new-allocations,
         trigger-reason: trigger-reason,
         executed-at: stacks-block-height
