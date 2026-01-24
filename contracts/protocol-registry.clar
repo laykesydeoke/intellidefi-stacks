@@ -90,7 +90,7 @@
 )
 
 (define-read-only (get-protocols-by-category (category uint))
-  (ok category) ;; Simplified - would filter protocols by category
+  (ok { category: category, total-protocols: (var-get protocol-counter) })
 )
 
 ;; Private functions
