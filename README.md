@@ -1,92 +1,67 @@
 # IntelliDeFi Protocol
 
-**Institutional AI-Driven DeFi Strategies on Bitcoin**
+**AI-Driven DeFi Strategies on Bitcoin**
 
-An innovative DeFi protocol built on Stacks that leverages artificial intelligence to optimize institutional-grade investment strategies while utilizing Bitcoin's security and stability.
+A DeFi protocol built on Stacks that leverages artificial intelligence to optimize investment strategies while utilizing Bitcoin's security and stability.
 
 ## Overview
 
-IntelliDeFi Protocol is the first AI-powered DeFi platform on the Stacks blockchain, designed specifically for institutional investors seeking sophisticated, automated trading strategies backed by Bitcoin's security model. The protocol combines machine learning algorithms with Clarity smart contracts to deliver risk-managed, cross-protocol DeFi optimization.
+IntelliDeFi Protocol is an AI-powered DeFi platform on the Stacks blockchain. The protocol combines machine learning algorithms with Clarity 4 smart contracts to deliver risk-managed, cross-protocol DeFi optimization.
 
-## Key Features
+## Smart Contracts
 
-- **AI-Driven Strategy Engine**: Machine learning algorithms analyze market conditions and optimize DeFi strategies in real-time
-- **Bitcoin Security**: Leverages Stacks' Bitcoin finality for institutional-grade trust and security
-- **Cross-Protocol Integration**: Seamlessly works across the entire Stacks DeFi ecosystem
-- **Risk Management**: Advanced risk assessment using Bitcoin's price stability as a foundation
-- **Institutional Compliance**: Built-in audit trails, reporting, and compliance monitoring
-- **Natural Language Interface**: AI-powered strategy descriptions and human-readable explanations
+| Contract | Description |
+|----------|-------------|
+| `strategy-engine` | Core strategy creation, investment, and withdrawal |
+| `risk-manager` | Risk profiles, portfolio validation, exposure limits |
+| `protocol-registry` | DeFi protocol whitelisting and integration |
+| `ai-oracle` | ML-powered oracle with market signals and predictions |
+| `strategy-optimizer` | Portfolio optimization, rebalancing, performance tracking |
+| `audit-trail` | Immutable action logging with authorized loggers |
+| `compliance-monitor` | KYC/AML compliance, transaction limits, user verification |
 
 ## Project Structure
 
 ```
-contracts/
-├── core/
-│   ├── strategy-engine.clar      # Main strategy execution
-│   ├── risk-manager.clar         # Risk assessment & limits
-│   └── protocol-registry.clar    # DeFi protocol integrations
-├── ai/
-│   ├── ai-oracle.clar           # AI decision oracle integration
-│   └── strategy-optimizer.clar   # ML-based optimization
-├── institutional/
-│   ├── compliance-monitor.clar   # Regulatory compliance
-│   ├── audit-trail.clar         # Immutable audit logs
-│   └── reporting-engine.clar    # Advanced reporting
-└── interfaces/
-    ├── nlp-processor.clar       # Natural language processing
-    └── dashboard-api.clar       # Frontend interface
+contracts/           # 7 Clarity 4 smart contracts
+tests/               # Vitest test suites for each contract
+frontend/            # Next.js 15 dashboard application
+  src/app/           # App router pages (landing, dashboard, strategies)
+  src/lib/           # Stacks wallet integration and contract helpers
 ```
 
 ## Technology Stack
 
 - **Blockchain**: Stacks (Bitcoin L2)
-- **Smart Contracts**: Clarity
-- **AI/ML**: Oracle-based decision engine
-- **Testing**: Vitest with TypeScript
-- **Development**: Clarinet framework
+- **Smart Contracts**: Clarity 4
+- **Frontend**: Next.js 15, React 19, Tailwind CSS
+- **Wallet**: @stacks/connect
+- **Testing**: Vitest + Clarinet SDK
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Clarinet](https://github.com/hirosystems/clarinet) installed
-- Node.js 16+ and npm
-- Git
+- [Clarinet](https://github.com/hirosystems/clarinet) v3.8+
+- Node.js 18+ and npm
 
-### Installation
+### Smart Contracts
 
-1. Clone the repository:
-```bash
-git clone https://github.com/aoakande/intellidefi-stacks.git
-cd intellidefi-stacks
-```
-
-2. Install dependencies:
 ```bash
 npm install
-```
-
-3. Run tests:
-```bash
+clarinet check
 npm test
 ```
 
-## Development Phases
+### Frontend
 
-1. **Core Foundation** - Basic strategy execution and risk framework
-2. **AI Integration** - Oracle-based AI decision engine
-3. **Multi-Protocol Hub** - Cross-protocol strategy execution
-4. **Institutional Features** - Advanced reporting and compliance
-5. **Natural Language Interface** - AI-powered strategy descriptions
-
-## Contributing
-
-This project is part of the Code for STX hackathon. For development guidelines and contribution instructions, please see the project documentation.
+```bash
+cd frontend
+npm install
+cp .env.example .env.local
+npm run dev
+```
 
 ## License
 
-MIT License - see LICENSE file for details.
-
----
-
-*IntelliDeFi Protocol - Bringing institutional-grade AI-driven DeFi to Bitcoin through Stacks*
+MIT
