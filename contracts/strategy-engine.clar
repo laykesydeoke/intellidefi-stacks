@@ -53,6 +53,10 @@
   (var-get strategy-counter)
 )
 
+(define-read-only (is-strategy-active (strategy-id uint))
+  (default-to false (get is-active (map-get? strategies { strategy-id: strategy-id })))
+)
+
 ;; Private functions
 (define-private (is-contract-owner)
   (is-eq tx-sender contract-owner)
