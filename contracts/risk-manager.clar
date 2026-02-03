@@ -81,6 +81,10 @@
   (var-get global-risk-multiplier)
 )
 
+(define-read-only (get-max-portfolio-risk)
+  (var-get max-portfolio-risk)
+)
+
 (define-read-only (calculate-position-risk (strategy-id uint) (amount uint))
   (let (
     (strategy-risk (unwrap! (get-strategy-risk-metrics strategy-id) (err u0)))
