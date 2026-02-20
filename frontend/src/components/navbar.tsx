@@ -9,6 +9,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/strategies', label: 'Strategies' },
+  { href: '/oracle', label: 'AI Oracle' },
 ];
 
 export default function Navbar() {
