@@ -127,7 +127,7 @@ describe("ai-oracle", () => {
       [Cl.uint(1)],
       deployer
     );
-    expect(result.type).toBe(7); // ok type
+    expect(result.type).toBe("ok");
   });
 
   it("can toggle oracle status", () => {

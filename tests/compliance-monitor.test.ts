@@ -60,7 +60,7 @@ describe("compliance-monitor", () => {
       [Cl.principal(wallet1), Cl.bool(true)],
       deployer
     );
-    expect(result.type).toBe(7); // ok
+    expect(result.type).toBe("ok");
   });
 
   it("rejects verification from non-officer", () => {
@@ -98,7 +98,7 @@ describe("compliance-monitor", () => {
       [Cl.principal(wallet1), Cl.bool(true)],
       wallet2
     );
-    expect(result.type).toBe(7); // ok
+    expect(result.type).toBe("ok");
   });
 
   it("can check transaction compliance", () => {

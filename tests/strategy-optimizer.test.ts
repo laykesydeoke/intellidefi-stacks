@@ -88,7 +88,7 @@ describe("strategy-optimizer", () => {
       [Cl.uint(1), Cl.uint(5), Cl.stringAscii("neutral")],
       deployer
     );
-    expect(result.type).toBe(7); // ok type
+    expect(result.type).toBe("ok");
   });
 
   it("can toggle optimization config", () => {
