@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Brain,
@@ -30,21 +30,14 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
+import { useStacks } from "@/lib/StacksProvider";
+import { formatAddress, formatSTX } from "@/lib/stacks";
+import StacksWalletConnect from "@/components/StacksWalletConnect";
 import {
-  isUserSignedIn,
-  connectWallet,
-  getUserData,
-  getUserAddress,
-  signOut,
-  formatAddress,
-  formatSTX,
-} from "@/lib/stacks";
-import {
-  CONTRACTS,
-  CONTRACT_FUNCTIONS,
-  STACKS_API_URL,
-  parseContractId,
-} from "@/lib/contracts";
+  useInvestInStrategy,
+  useWithdrawFromStrategy,
+  useSetRiskProfile,
+} from "@/lib/stacksHooks";
 
 type TabId = "overview" | "strategies" | "ai-insights" | "risk-profile";
 
@@ -160,6 +153,8 @@ const MOCK_PREDICTIONS: Prediction[] = [
 ];
 
 function WalletPrompt() {
+  const { connect } = useStacks();
+
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md text-center">
@@ -175,7 +170,7 @@ function WalletPrompt() {
             manage strategies, and view AI insights.
           </p>
           <button
-            onClick={() => connectWallet()}
+            onClick={connect}
             className="intellidefi-button-primary w-full text-lg py-4"
           >
             <Wallet className="h-5 w-5" />
@@ -195,10 +190,10 @@ function WalletPrompt() {
 
 function DashboardNavbar({
   address,
-  onSignOut,
+  onDisconnect,
 }: {
   address: string;
-  onSignOut: () => void;
+  onDisconnect: () => void;
 }) {
   return (
     <nav className="sticky top-0 z-50 border-b border-surface-800/50 bg-surface-950/80 backdrop-blur-xl">
@@ -218,7 +213,7 @@ function DashboardNavbar({
             </span>
           </div>
           <button
-            onClick={onSignOut}
+            onClick={onDisconnect}
             className="flex items-center gap-2 rounded-lg border border-surface-700 bg-surface-900/60 px-3 py-2 text-sm text-surface-400 transition-colors hover:border-red-500/30 hover:text-red-400"
           >
             <LogOut className="h-4 w-4" />
@@ -414,60 +409,19 @@ function OverviewTab() {
 function StrategiesTab() {
   const [investingId, setInvestingId] = useState<number | null>(null);
   const [investAmount, setInvestAmount] = useState("");
+  const { invest, isLoading: investLoading } = useInvestInStrategy();
+  const { withdraw, isLoading: withdrawLoading } = useWithdrawFromStrategy();
 
   const handleInvest = async (strategyId: number) => {
     if (!investAmount || isNaN(Number(investAmount))) return;
-
     const amount = Math.floor(Number(investAmount) * 1_000_000);
-
-    try {
-      const { openContractCall } = await import("@stacks/connect");
-      const { uintCV } = await import("@stacks/transactions");
-      const { network } = await import("@/lib/stacks");
-
-      await openContractCall({
-        contractAddress: CONTRACTS.strategyEngine.address,
-        contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.investInStrategy,
-        functionArgs: [uintCV(strategyId), uintCV(amount)],
-        network,
-        onFinish: (data) => {
-          console.log("Investment transaction:", data);
-          setInvestingId(null);
-          setInvestAmount("");
-        },
-        onCancel: () => {
-          setInvestingId(null);
-          setInvestAmount("");
-        },
-      });
-    } catch (err) {
-      console.error("Investment failed:", err);
-    }
+    await invest(strategyId, amount);
+    setInvestingId(null);
+    setInvestAmount("");
   };
 
   const handleWithdraw = async (strategyId: number) => {
-    try {
-      const { openContractCall } = await import("@stacks/connect");
-      const { uintCV } = await import("@stacks/transactions");
-      const { network } = await import("@/lib/stacks");
-
-      await openContractCall({
-        contractAddress: CONTRACTS.strategyEngine.address,
-        contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.withdrawFromStrategy,
-        functionArgs: [uintCV(strategyId)],
-        network,
-        onFinish: (data) => {
-          console.log("Withdrawal transaction:", data);
-        },
-        onCancel: () => {
-          console.log("Withdrawal cancelled");
-        },
-      });
-    } catch (err) {
-      console.error("Withdrawal failed:", err);
-    }
+    await withdraw(strategyId, 0);
   };
 
   const statusStyles = {
@@ -543,9 +497,10 @@ function StrategiesTab() {
                     />
                     <button
                       onClick={() => handleInvest(strategy.id)}
+                      disabled={investLoading}
                       className="intellidefi-button-primary px-4 py-2 text-sm"
                     >
-                      Confirm
+                      {investLoading ? "..." : "Confirm"}
                     </button>
                     <button
                       onClick={() => {
@@ -568,6 +523,7 @@ function StrategiesTab() {
                     </button>
                     <button
                       onClick={() => handleWithdraw(strategy.id)}
+                      disabled={withdrawLoading}
                       className="intellidefi-button-secondary px-5 py-2 text-sm"
                     >
                       Withdraw
@@ -738,33 +694,10 @@ function AIInsightsTab() {
 function RiskProfileTab() {
   const [maxRisk, setMaxRisk] = useState(5);
   const [maxAllocation, setMaxAllocation] = useState(25);
-  const [saving, setSaving] = useState(false);
+  const { setRiskProfile, isLoading: saving } = useSetRiskProfile();
 
   const handleSaveProfile = async () => {
-    setSaving(true);
-    try {
-      const { openContractCall } = await import("@stacks/connect");
-      const { uintCV } = await import("@stacks/transactions");
-      const { network } = await import("@/lib/stacks");
-
-      await openContractCall({
-        contractAddress: CONTRACTS.riskManager.address,
-        contractName: CONTRACTS.riskManager.name,
-        functionName: CONTRACT_FUNCTIONS.riskManager.setUserRiskProfile,
-        functionArgs: [uintCV(maxRisk), uintCV(maxAllocation)],
-        network,
-        onFinish: (data) => {
-          console.log("Risk profile updated:", data);
-          setSaving(false);
-        },
-        onCancel: () => {
-          setSaving(false);
-        },
-      });
-    } catch (err) {
-      console.error("Risk profile update failed:", err);
-      setSaving(false);
-    }
+    await setRiskProfile(maxRisk, maxAllocation, 2);
   };
 
   const riskLabel = (level: number) => {
@@ -923,19 +856,12 @@ function RiskProfileTab() {
 }
 
 export default function DashboardPage() {
-  const [signedIn, setSignedIn] = useState(false);
-  const [address, setAddress] = useState("");
+  const { connected, address, disconnect } = useStacks();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const connected = isUserSignedIn();
-    setSignedIn(connected);
-    if (connected) {
-      const addr = getUserAddress();
-      if (addr) setAddress(addr);
-    }
   }, []);
 
   if (!mounted) {
@@ -946,13 +872,13 @@ export default function DashboardPage() {
     );
   }
 
-  if (!signedIn) {
+  if (!connected) {
     return <WalletPrompt />;
   }
 
   return (
     <div className="min-h-screen">
-      <DashboardNavbar address={address} onSignOut={signOut} />
+      <DashboardNavbar address={address || ""} onDisconnect={disconnect} />
       <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
