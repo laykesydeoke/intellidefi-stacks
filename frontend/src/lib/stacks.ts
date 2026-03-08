@@ -33,7 +33,7 @@ export const connectStacksWallet = async (): Promise<boolean> => {
     const authOptions = {
       appDetails: {
         name: 'IntelliDeFi Protocol',
-        icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.ico' : '',
+        icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.svg' : '',
       },
       onFinish: () => {
         resolve(true);
