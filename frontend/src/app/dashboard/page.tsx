@@ -428,7 +428,7 @@ function StrategiesTab() {
       await openContractCall({
         contractAddress: CONTRACTS.strategyEngine.address,
         contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.invest,
+        functionName: CONTRACT_FUNCTIONS.strategyEngine.investInStrategy,
         functionArgs: [uintCV(strategyId), uintCV(amount)],
         network,
         onFinish: (data) => {
@@ -455,7 +455,7 @@ function StrategiesTab() {
       await openContractCall({
         contractAddress: CONTRACTS.strategyEngine.address,
         contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.withdraw,
+        functionName: CONTRACT_FUNCTIONS.strategyEngine.withdrawFromStrategy,
         functionArgs: [uintCV(strategyId)],
         network,
         onFinish: (data) => {
@@ -750,7 +750,7 @@ function RiskProfileTab() {
       await openContractCall({
         contractAddress: CONTRACTS.riskManager.address,
         contractName: CONTRACTS.riskManager.name,
-        functionName: CONTRACT_FUNCTIONS.riskManager.setRiskProfile,
+        functionName: CONTRACT_FUNCTIONS.riskManager.setUserRiskProfile,
         functionArgs: [uintCV(maxRisk), uintCV(maxAllocation)],
         network,
         onFinish: (data) => {

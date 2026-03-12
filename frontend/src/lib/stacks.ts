@@ -1,15 +1,19 @@
+'use client';
+
 import { AppConfig, UserSession, showConnect } from "@stacks/connect";
-import { StacksTestnet, StacksMainnet } from "@stacks/network";
 
 const appConfig = new AppConfig(["store_write"]);
 export const userSession = new UserSession({ appConfig });
 
 const networkEnv = process.env.NEXT_PUBLIC_NETWORK || "testnet";
 
-export const network =
-  networkEnv === "mainnet" ? new StacksMainnet() : new StacksTestnet();
+export const network = networkEnv === "mainnet" ? "mainnet" : "testnet";
 
 export function isUserSignedIn(): boolean {
+  return userSession.isUserSignedIn();
+}
+
+export function isWalletConnected(): boolean {
   return userSession.isUserSignedIn();
 }
 
@@ -23,9 +27,12 @@ export function getUserData() {
 export function getUserAddress(): string | null {
   const userData = getUserData();
   if (!userData) return null;
-  const networkKey =
-    networkEnv === "mainnet" ? "mainnet" : "testnet";
+  const networkKey = networkEnv === "mainnet" ? "mainnet" : "testnet";
   return userData.profile?.stxAddress?.[networkKey] || null;
+}
+
+export function getWalletAddress(): string {
+  return getUserAddress() || "";
 }
 
 export function connectWallet(onFinish?: () => void) {
@@ -46,9 +53,13 @@ export function connectWallet(onFinish?: () => void) {
   });
 }
 
-export function signOut() {
+export function disconnectWallet() {
   userSession.signUserOut();
   window.location.href = "/";
+}
+
+export function signOut() {
+  disconnectWallet();
 }
 
 export function formatAddress(address: string): string {

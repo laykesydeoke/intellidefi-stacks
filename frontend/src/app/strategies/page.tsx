@@ -447,7 +447,7 @@ function StrategyCard({
       await openContractCall({
         contractAddress: CONTRACTS.strategyEngine.address,
         contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.invest,
+        functionName: CONTRACT_FUNCTIONS.strategyEngine.investInStrategy,
         functionArgs: [uintCV(strategy.id), uintCV(amount)],
         network,
         onFinish: (data) => {
@@ -473,7 +473,7 @@ function StrategyCard({
       await openContractCall({
         contractAddress: CONTRACTS.strategyEngine.address,
         contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.withdraw,
+        functionName: CONTRACT_FUNCTIONS.strategyEngine.withdrawFromStrategy,
         functionArgs: [uintCV(strategy.id)],
         network,
         onFinish: (data) => {
