@@ -22,20 +22,14 @@ import {
   Target,
   Gauge,
 } from "lucide-react";
+import { useStacks } from "@/lib/StacksProvider";
+import { formatAddress, formatSTX } from "@/lib/stacks";
+import { CompactStacksWalletConnect } from "@/components/StacksWalletConnect";
 import {
-  isUserSignedIn,
-  connectWallet,
-  getUserAddress,
-  signOut,
-  formatAddress,
-  formatSTX,
-} from "@/lib/stacks";
-import {
-  CONTRACTS,
-  CONTRACT_FUNCTIONS,
-  STACKS_API_URL,
-  parseContractId,
-} from "@/lib/contracts";
+  useCreateStrategy,
+  useInvestInStrategy,
+  useWithdrawFromStrategy,
+} from "@/lib/stacksHooks";
 
 interface StrategyForm {
   name: string;
@@ -108,13 +102,9 @@ const MOCK_EXISTING_STRATEGIES: ExistingStrategy[] = [
   },
 ];
 
-function StrategyNavbar({
-  address,
-  signedIn,
-}: {
-  address: string;
-  signedIn: boolean;
-}) {
+function StrategyNavbar() {
+  const { connected, address, disconnect } = useStacks();
+
   return (
     <nav className="sticky top-0 z-50 border-b border-surface-800/50 bg-surface-950/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
@@ -132,7 +122,7 @@ function StrategyNavbar({
         </div>
 
         <div className="flex items-center gap-4">
-          {signedIn ? (
+          {connected ? (
             <>
               <Link
                 href="/dashboard"
@@ -143,24 +133,18 @@ function StrategyNavbar({
               <div className="hidden sm:flex items-center gap-2 rounded-lg border border-surface-700 bg-surface-900/60 px-4 py-2">
                 <div className="h-2 w-2 rounded-full bg-emerald-400" />
                 <span className="text-sm font-mono text-surface-300">
-                  {formatAddress(address)}
+                  {formatAddress(address || "")}
                 </span>
               </div>
               <button
-                onClick={signOut}
+                onClick={disconnect}
                 className="flex items-center gap-2 rounded-lg border border-surface-700 bg-surface-900/60 px-3 py-2 text-sm text-surface-400 transition-colors hover:border-red-500/30 hover:text-red-400"
               >
                 <LogOut className="h-4 w-4" />
               </button>
             </>
           ) : (
-            <button
-              onClick={() => connectWallet()}
-              className="intellidefi-button-primary px-5 py-2.5 text-sm"
-            >
-              <Wallet className="h-4 w-4" />
-              Connect
-            </button>
+            <CompactStacksWalletConnect />
           )}
         </div>
       </div>
@@ -181,8 +165,8 @@ function CreateStrategyForm({
     maxAmount: "",
     riskLevel: 5,
   });
-  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof StrategyForm, string>>>({});
+  const { createStrategy, isLoading: submitting } = useCreateStrategy();
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof StrategyForm, string>> = {};
@@ -217,40 +201,11 @@ function CreateStrategyForm({
     e.preventDefault();
     if (!validate()) return;
 
-    setSubmitting(true);
-
     const minMicro = Math.floor(Number(form.minAmount) * 1_000_000);
     const maxMicro = Math.floor(Number(form.maxAmount) * 1_000_000);
 
-    try {
-      const { openContractCall } = await import("@stacks/connect");
-      const { stringAsciiCV, uintCV } = await import("@stacks/transactions");
-      const { network } = await import("@/lib/stacks");
-
-      await openContractCall({
-        contractAddress: CONTRACTS.strategyEngine.address,
-        contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.createStrategy,
-        functionArgs: [
-          stringAsciiCV(form.name),
-          uintCV(minMicro),
-          uintCV(maxMicro),
-          uintCV(form.riskLevel),
-        ],
-        network,
-        onFinish: (data) => {
-          console.log("Strategy created:", data);
-          onSubmit(form);
-          setSubmitting(false);
-        },
-        onCancel: () => {
-          setSubmitting(false);
-        },
-      });
-    } catch (err) {
-      console.error("Strategy creation failed:", err);
-      setSubmitting(false);
-    }
+    await createStrategy(form.name, minMicro, maxMicro, form.riskLevel);
+    onSubmit(form);
   };
 
   const riskLabel = (level: number) => {
@@ -426,64 +381,25 @@ function CreateStrategyForm({
 
 function StrategyCard({
   strategy,
-  signedIn,
 }: {
   strategy: ExistingStrategy;
-  signedIn: boolean;
 }) {
   const [investAmount, setInvestAmount] = useState("");
   const [showInvestForm, setShowInvestForm] = useState(false);
+  const { connected, connect } = useStacks();
+  const { invest, isLoading: investLoading } = useInvestInStrategy();
+  const { withdraw, isLoading: withdrawLoading } = useWithdrawFromStrategy();
 
   const handleInvest = async () => {
     if (!investAmount || isNaN(Number(investAmount))) return;
-
     const amount = Math.floor(Number(investAmount) * 1_000_000);
-
-    try {
-      const { openContractCall } = await import("@stacks/connect");
-      const { uintCV } = await import("@stacks/transactions");
-      const { network } = await import("@/lib/stacks");
-
-      await openContractCall({
-        contractAddress: CONTRACTS.strategyEngine.address,
-        contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.investInStrategy,
-        functionArgs: [uintCV(strategy.id), uintCV(amount)],
-        network,
-        onFinish: (data) => {
-          console.log("Investment submitted:", data);
-          setShowInvestForm(false);
-          setInvestAmount("");
-        },
-        onCancel: () => {
-          setShowInvestForm(false);
-        },
-      });
-    } catch (err) {
-      console.error("Investment failed:", err);
-    }
+    await invest(strategy.id, amount);
+    setShowInvestForm(false);
+    setInvestAmount("");
   };
 
   const handleWithdraw = async () => {
-    try {
-      const { openContractCall } = await import("@stacks/connect");
-      const { uintCV } = await import("@stacks/transactions");
-      const { network } = await import("@/lib/stacks");
-
-      await openContractCall({
-        contractAddress: CONTRACTS.strategyEngine.address,
-        contractName: CONTRACTS.strategyEngine.name,
-        functionName: CONTRACT_FUNCTIONS.strategyEngine.withdrawFromStrategy,
-        functionArgs: [uintCV(strategy.id)],
-        network,
-        onFinish: (data) => {
-          console.log("Withdrawal submitted:", data);
-        },
-        onCancel: () => {},
-      });
-    } catch (err) {
-      console.error("Withdrawal failed:", err);
-    }
+    await withdraw(strategy.id, 0);
   };
 
   const riskColor = (level: number) => {
@@ -561,10 +477,10 @@ function StrategyCard({
             />
             <button
               onClick={handleInvest}
-              disabled={!investAmount}
+              disabled={!investAmount || investLoading}
               className="intellidefi-button-primary px-6"
             >
-              Confirm
+              {investLoading ? "..." : "Confirm"}
             </button>
             <button
               onClick={() => {
@@ -581,8 +497,8 @@ function StrategyCard({
         <div className="flex gap-3">
           <button
             onClick={() => {
-              if (!signedIn) {
-                connectWallet();
+              if (!connected) {
+                connect();
                 return;
               }
               setShowInvestForm(true);
@@ -595,12 +511,13 @@ function StrategyCard({
           </button>
           <button
             onClick={() => {
-              if (!signedIn) {
-                connectWallet();
+              if (!connected) {
+                connect();
                 return;
               }
               handleWithdraw();
             }}
+            disabled={withdrawLoading}
             className="intellidefi-button-secondary flex-1 py-2.5"
           >
             Withdraw
@@ -612,20 +529,13 @@ function StrategyCard({
 }
 
 export default function StrategiesPage() {
-  const [signedIn, setSignedIn] = useState(false);
-  const [address, setAddress] = useState("");
+  const { connected } = useStacks();
   const [showCreate, setShowCreate] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [filterActive, setFilterActive] = useState<"all" | "active" | "inactive">("all");
 
   useEffect(() => {
     setMounted(true);
-    const connected = isUserSignedIn();
-    setSignedIn(connected);
-    if (connected) {
-      const addr = getUserAddress();
-      if (addr) setAddress(addr);
-    }
   }, []);
 
   if (!mounted) {
@@ -654,7 +564,7 @@ export default function StrategiesPage() {
 
   return (
     <div className="min-h-screen">
-      <StrategyNavbar address={address} signedIn={signedIn} />
+      <StrategyNavbar />
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
@@ -667,7 +577,7 @@ export default function StrategiesPage() {
                 Create, manage, and invest in AI-optimized strategies
               </p>
             </div>
-            {signedIn && (
+            {connected && (
               <button
                 onClick={() => setShowCreate(!showCreate)}
                 className={
@@ -767,7 +677,6 @@ export default function StrategiesPage() {
             <StrategyCard
               key={strategy.id}
               strategy={strategy}
-              signedIn={signedIn}
             />
           ))}
         </div>

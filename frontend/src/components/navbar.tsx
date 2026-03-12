@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { connectWallet, disconnectWallet, isWalletConnected, getWalletAddress } from '@/lib/stacks';
-import { useState, useEffect } from 'react';
+import { useStacks } from '@/lib/StacksProvider';
+import { CompactStacksWalletConnect } from '@/components/StacksWalletConnect';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -14,40 +14,6 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [connected, setConnected] = useState(false);
-  const [address, setAddress] = useState('');
-
-  useEffect(() => {
-    const checkWallet = () => {
-      const walletConnected = isWalletConnected();
-      setConnected(walletConnected);
-      if (walletConnected) {
-        setAddress(getWalletAddress());
-      }
-    };
-    checkWallet();
-  }, []);
-
-  const handleConnect = async () => {
-    try {
-      await connectWallet();
-      setConnected(true);
-      setAddress(getWalletAddress());
-    } catch {
-      console.error('Failed to connect wallet');
-    }
-  };
-
-  const handleDisconnect = () => {
-    disconnectWallet();
-    setConnected(false);
-    setAddress('');
-  };
-
-  const truncateAddress = (addr: string) => {
-    if (!addr) return '';
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
 
   return (
     <nav className="border-b border-gray-800 bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50">
@@ -73,26 +39,7 @@ export default function Navbar() {
               ))}
             </div>
           </div>
-          <div>
-            {connected ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-400">{truncateAddress(address)}</span>
-                <button
-                  onClick={handleDisconnect}
-                  className="px-4 py-2 text-sm rounded-lg bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
-                >
-                  Disconnect
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={handleConnect}
-                className="px-4 py-2 text-sm rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
-              >
-                Connect Wallet
-              </button>
-            )}
-          </div>
+          <CompactStacksWalletConnect />
         </div>
       </div>
     </nav>
