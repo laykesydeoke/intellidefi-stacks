@@ -86,7 +86,7 @@ export function useCreateStrategy() {
         postConditionMode: PostConditionMode.Allow,
         appDetails: {
           name: 'IntelliDeFi Protocol',
-          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.ico' : '',
+          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.svg' : '',
         },
         onFinish: async (data: any) => {
           setTxId(data.txId);
@@ -140,7 +140,7 @@ export function useInvestInStrategy() {
         postConditionMode: PostConditionMode.Allow,
         appDetails: {
           name: 'IntelliDeFi Protocol',
-          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.ico' : '',
+          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.svg' : '',
         },
         onFinish: async (data: any) => {
           setTxId(data.txId);
@@ -195,7 +195,7 @@ export function useWithdrawFromStrategy() {
         postConditionMode: PostConditionMode.Allow,
         appDetails: {
           name: 'IntelliDeFi Protocol',
-          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.ico' : '',
+          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.svg' : '',
         },
         onFinish: async (data: any) => {
           setTxId(data.txId);
@@ -254,7 +254,7 @@ export function useSetRiskProfile() {
         postConditionMode: PostConditionMode.Allow,
         appDetails: {
           name: 'IntelliDeFi Protocol',
-          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.ico' : '',
+          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.svg' : '',
         },
         onFinish: async (data: any) => {
           setTxId(data.txId);
@@ -327,7 +327,7 @@ export function useGenerateMarketSignal() {
         postConditionMode: PostConditionMode.Allow,
         appDetails: {
           name: 'IntelliDeFi Protocol',
-          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.ico' : '',
+          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.svg' : '',
         },
         onFinish: async (data: any) => {
           setTxId(data.txId);
@@ -385,7 +385,7 @@ export function useRegisterUser() {
         postConditionMode: PostConditionMode.Allow,
         appDetails: {
           name: 'IntelliDeFi Protocol',
-          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.ico' : '',
+          icon: typeof window !== 'undefined' ? window.location.origin + '/favicon.svg' : '',
         },
         onFinish: async (data: any) => {
           setTxId(data.txId);
